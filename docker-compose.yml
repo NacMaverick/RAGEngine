@@ -74,6 +74,54 @@ services:
       timeout: 20s
       retries: 3
 
+  # API Gateway
+  api:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: rag_api
+    restart: always
+    command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+    volumes:
+      - ./backend:/app
+    ports:
+      - "8000:8000"
+    env_file: .env
+    environment:
+      - POSTGRES_HOST=db
+      - REDIS_URL=redis://rag_redis:6379/0
+      - TYPESENSE_HOST=typesense
+      - MINIO_ENDPOINT=minio:9000
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+      typesense:
+        condition: service_started
+
+  # Ingestion Worker
+  worker:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: rag_worker
+    restart: always
+    command: arq app.worker.WorkerSettings --watch
+    volumes:
+      - ./backend:/app
+    env_file: .env
+    environment:
+      - POSTGRES_HOST=db
+      - REDIS_URL=redis://rag_redis:6379/0
+      - MINIO_ENDPOINT=minio:9000
+      - TYPESENSE_HOST=typesense
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+
 volumes:
   postgres_data:
   typesense_data:
