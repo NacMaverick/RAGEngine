@@ -15,7 +15,7 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U admin -d rage_db"]
+      test: [ "CMD-SHELL", "pg_isready -U admin -d rage_db" ]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -34,7 +34,7 @@ services:
     volumes:
       - typesense_data:/data
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8108/health"]
+      test: [ "CMD", "curl", "-f", "http://localhost:8108/health" ]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -45,11 +45,11 @@ services:
     container_name: rag_redis
     restart: always
     ports:
-      - "6379:6379"
+      - "6380:6379"
     volumes:
       - redis_data:/data
     healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
+      test: [ "CMD", "redis-cli", "ping" ]
       interval: 10s
       timeout: 5s
       retries: 3
@@ -69,7 +69,7 @@ services:
     volumes:
       - minio_data:/data
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      test: [ "CMD", "curl", "-f", "http://localhost:9000/minio/health/live" ]
       interval: 30s
       timeout: 20s
       retries: 3
